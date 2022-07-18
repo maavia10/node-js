@@ -1,0 +1,39 @@
+version: "3.8"
+
+services:
+  mongodb:
+    image: mongo:5.0.2
+    restart: unless-stopped
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=root
+    ports:
+      - 27017:27017
+    volumes:
+      - db:/data/db
+    networks:
+      - test-network
+  app:
+    depends_on:
+      - mongodb
+    build: ./
+    volumes:
+      - ./:/var/www/project
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    environment:
+      - DB_HOST=mongodb
+      - DB_USER=root
+      - DB_PASSWORD=root
+      - DB_NAME=myProject
+      - DB_PORT=27017
+    stdin_open: true
+    tty: true
+    networks:
+      - test-network
+volumes:
+  db:
+
+networks:
+  test-network:
